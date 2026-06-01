@@ -1,127 +1,192 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Egg Incubator Monitor</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;600;700&family=Hanken+Grotesque:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
 </head>
 <body>
+<div class="wrap">
 
-<header>
-    <div class="brand">
-        <svg class="brand-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M12 2C8 2 4 6.5 4 11a8 8 0 0 0 16 0c0-4.5-4-9-8-9z"/>
-            <path d="M12 7v5l3 2"/>
-        </svg>
-        <div class="brand-text">
-            <span class="brand-name">Egg Incubator Monitor</span>
-            <span class="brand-sub">AM2302 · ESP32 · Firebase Realtime Database</span>
+    <!-- ── Header ─────────────────────────────────────────── -->
+    <header>
+        <div class="brand">
+            <div class="mark" aria-hidden="true"></div>
+            <div>
+                <h1>Egg Incubator Monitor</h1>
+                <div class="sub">AM2302 · ESP32 · Firebase Realtime Database</div>
+            </div>
         </div>
-    </div>
-    <div class="status-pill">
-        <span class="status-dot" id="statusDot"></span>
-        <span id="statusLabel">Connecting</span>
-    </div>
-</header>
+        <div class="head-right">
+            <span class="live-pill" id="livePill">
+                <span class="live-dot" id="liveDot"></span>
+                <span id="liveLabel">Connecting</span>
+            </span>
+            <button class="theme-btn" id="themeBtn" aria-label="Toggle dark mode" title="Toggle theme">
+                <svg class="ico-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                    <circle cx="12" cy="12" r="4.2"/>
+                    <path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M19.1 4.9l-1.8 1.8M6.7 17.3l-1.8 1.8"/>
+                </svg>
+                <svg class="ico-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M20 14.5A8 8 0 1 1 9.5 4a6.3 6.3 0 0 0 10.5 10.5z"/>
+                </svg>
+            </button>
+        </div>
+    </header>
 
-<main>
-    <div class="row-header">
+    <!-- ── Status strip ───────────────────────────────────── -->
+    <div class="strip">
+        <span class="chip">
+            <span class="chip-dot" id="stripDot"></span>
+            <span id="stripConn">Connecting…</span>
+        </span>
+        <span class="chip-sep"></span>
+        <span class="chip"><span class="k">Sensor</span>AM2302</span>
+        <span class="chip-sep"></span>
+        <span class="chip"><span class="k">Uptime</span><span id="stripUptime">—</span></span>
+        <span class="chip-sep"></span>
+        <span class="chip"><span class="k">Sample</span>every 15 s</span>
+        <span class="chip push" id="stripSynced">—</span>
+    </div>
+
+    <!-- ── Live readings ──────────────────────────────────── -->
+    <div class="sec-head">
         <h2>Live Readings</h2>
-        <span id="lastSeen"></span>
+        <span class="meta" id="lastSeen"></span>
     </div>
 
     <div class="cards">
-        <div class="card">
-            <div class="card-header">
+
+        <!-- Temperature -->
+        <div class="card" style="--accent: var(--temp); --accent-soft: var(--temp-soft);">
+            <div class="card-top">
                 <span class="card-label">Temperature</span>
-                <div class="card-badge badge-temp">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M14 14.76V3.5a2.5 2.5 0 0 0-5 0v11.26a4.5 4.5 0 1 0 5 0z"/>
-                    </svg>
+                <span class="badge"><span class="g-temp"></span></span>
+            </div>
+            <div class="readout">
+                <span class="num" id="val-temp">—</span>
+                <span class="unit">°C</span>
+            </div>
+            <div class="range">
+                <div class="range-track">
+                    <div class="range-band" id="band-temp"></div>
+                    <div class="range-marker" id="marker-temp"></div>
+                </div>
+                <div class="range-scale">
+                    <span id="rscale-min-temp"></span>
+                    <span class="tgt" id="rscale-tgt-temp"></span>
+                    <span id="rscale-max-temp"></span>
                 </div>
             </div>
-            <div class="card-value-row">
-                <span class="card-value" id="val-temp">—</span>
-                <span class="card-unit">°C</span>
-            </div>
-            <div class="card-footer">
-                <span class="card-time" id="meta-temp">Waiting for data…</span>
-                <span class="card-range" id="range-temp"></span>
+            <div class="card-foot">
+                <span class="status-pill" id="status-temp"><span class="sd"></span><span>—</span></span>
+                <span class="minmax" id="minmax-temp"></span>
             </div>
         </div>
 
-        <div class="card">
-            <div class="card-header">
+        <!-- Humidity -->
+        <div class="card" style="--accent: var(--humid); --accent-soft: var(--humid-soft);">
+            <div class="card-top">
                 <span class="card-label">Humidity</span>
-                <div class="card-badge badge-hum">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/>
-                    </svg>
+                <span class="badge"><span class="g-humid"></span></span>
+            </div>
+            <div class="readout">
+                <span class="num" id="val-hum">—</span>
+                <span class="unit">%</span>
+            </div>
+            <div class="range">
+                <div class="range-track">
+                    <div class="range-band" id="band-hum"></div>
+                    <div class="range-marker" id="marker-hum"></div>
+                </div>
+                <div class="range-scale">
+                    <span id="rscale-min-hum"></span>
+                    <span class="tgt" id="rscale-tgt-hum"></span>
+                    <span id="rscale-max-hum"></span>
                 </div>
             </div>
-            <div class="card-value-row">
-                <span class="card-value" id="val-hum">—</span>
-                <span class="card-unit">%</span>
-            </div>
-            <div class="card-footer">
-                <span class="card-time" id="meta-hum">Waiting for data…</span>
-                <span class="card-range" id="range-hum"></span>
+            <div class="card-foot">
+                <span class="status-pill" id="status-hum"><span class="sd"></span><span>—</span></span>
+                <span class="minmax" id="minmax-hum"></span>
             </div>
         </div>
 
-        <div class="card">
-            <div class="card-header">
+        <!-- Heat Index -->
+        <div class="card" style="--accent: var(--heat); --accent-soft: var(--heat-soft);">
+            <div class="card-top">
                 <span class="card-label">Heat Index</span>
-                <div class="card-badge badge-hi">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <circle cx="12" cy="12" r="5"/>
-                        <line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/>
-                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
-                        <line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/>
-                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
-                    </svg>
+                <span class="badge"><span class="g-heat"></span></span>
+            </div>
+            <div class="readout">
+                <span class="num" id="val-hi">—</span>
+                <span class="unit">°C</span>
+            </div>
+            <div class="range">
+                <div class="range-track">
+                    <div class="range-band" id="band-hi"></div>
+                    <div class="range-marker" id="marker-hi"></div>
+                </div>
+                <div class="range-scale">
+                    <span id="rscale-min-hi"></span>
+                    <span class="tgt" id="rscale-tgt-hi"></span>
+                    <span id="rscale-max-hi"></span>
                 </div>
             </div>
-            <div class="card-value-row">
-                <span class="card-value" id="val-hi">—</span>
-                <span class="card-unit">°C</span>
-            </div>
-            <div class="card-footer">
-                <span class="card-time" id="meta-hi">Waiting for data…</span>
-                <span class="card-range" id="range-hi"></span>
+            <div class="card-foot">
+                <span class="status-pill" id="status-hi"><span class="sd"></span><span>—</span></span>
+                <span class="minmax" id="minmax-hi"></span>
             </div>
         </div>
+
     </div>
 
-    <div class="row-header">
+    <!-- ── Historical charts ───────────────────────────────── -->
+    <div class="sec-head">
         <h2>Historical Data</h2>
-        <span>Last 50 readings &middot; x-axis: time since ESP32 boot</span>
+        <span class="meta">Last 50 readings · x-axis: time since ESP32 boot</span>
     </div>
-    <div class="charts-grid">
-        <div class="chart-card">
-            <p class="chart-title">Temperature &amp; Heat Index</p>
-            <div class="chart-wrap">
+
+    <div class="charts">
+        <div class="panel">
+            <div class="panel-head">
+                <h3>Temperature &amp; Heat Index</h3>
+                <div class="legend">
+                    <span class="leg"><span class="sw" style="background: var(--temp);"></span>Temperature</span>
+                    <span class="leg"><span class="sw sw-dashed" style="border-color: var(--heat);"></span>Heat Index</span>
+                </div>
+            </div>
+            <div class="chart-box">
                 <canvas id="tempChart"></canvas>
-                <div class="chart-empty" id="chartEmptyTemp">Waiting for data…</div>
+                <div class="chart-empty" id="emptyTemp">Waiting for data…</div>
             </div>
         </div>
-        <div class="chart-card">
-            <p class="chart-title">Humidity</p>
-            <div class="chart-wrap">
+
+        <div class="panel">
+            <div class="panel-head">
+                <h3>Humidity</h3>
+                <div class="legend">
+                    <span class="leg"><span class="sw" style="background: var(--humid);"></span>Humidity %</span>
+                </div>
+            </div>
+            <div class="chart-box">
                 <canvas id="humChart"></canvas>
-                <div class="chart-empty" id="chartEmptyHum">Waiting for data…</div>
+                <div class="chart-empty" id="emptyHum">Waiting for data…</div>
             </div>
         </div>
     </div>
-</main>
 
-<footer>
-    Updates every 15 s &middot; Firebase Realtime Database live listener
-</footer>
+    <!-- ── Footer ─────────────────────────────────────────── -->
+    <footer>
+        <span>Egg Incubator Monitor · v2</span>
+        <span>Updates every 15 s · Firebase Realtime Database</span>
+    </footer>
 
+</div>
 <script type="module" src="app.js"></script>
-
 </body>
 </html>
