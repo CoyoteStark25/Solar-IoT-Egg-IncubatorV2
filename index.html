@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Egg Incubator Monitor</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+</head>
+<body>
+
+<header>
+    <div class="brand">
+        <svg class="brand-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 2C8 2 4 6.5 4 11a8 8 0 0 0 16 0c0-4.5-4-9-8-9z"/>
+            <path d="M12 7v5l3 2"/>
+        </svg>
+        <div class="brand-text">
+            <span class="brand-name">Egg Incubator Monitor</span>
+            <span class="brand-sub">AM2302 · ESP32 · Firebase Realtime Database</span>
+        </div>
+    </div>
+    <div class="status-pill">
+        <span class="status-dot" id="statusDot"></span>
+        <span id="statusLabel">Connecting</span>
+    </div>
+</header>
+
+<main>
+    <div class="row-header">
+        <h2>Live Readings</h2>
+        <span id="lastSeen"></span>
+    </div>
+
+    <div class="cards">
+        <div class="card">
+            <div class="card-header">
+                <span class="card-label">Temperature</span>
+                <div class="card-badge badge-temp">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M14 14.76V3.5a2.5 2.5 0 0 0-5 0v11.26a4.5 4.5 0 1 0 5 0z"/>
+                    </svg>
+                </div>
+            </div>
+            <div class="card-value-row">
+                <span class="card-value" id="val-temp">—</span>
+                <span class="card-unit">°C</span>
+            </div>
+            <div class="card-footer">
+                <span class="card-time" id="meta-temp">Waiting for data…</span>
+                <span class="card-range" id="range-temp"></span>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <span class="card-label">Humidity</span>
+                <div class="card-badge badge-hum">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/>
+                    </svg>
+                </div>
+            </div>
+            <div class="card-value-row">
+                <span class="card-value" id="val-hum">—</span>
+                <span class="card-unit">%</span>
+            </div>
+            <div class="card-footer">
+                <span class="card-time" id="meta-hum">Waiting for data…</span>
+                <span class="card-range" id="range-hum"></span>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <span class="card-label">Heat Index</span>
+                <div class="card-badge badge-hi">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"/>
+                        <line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+                        <line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+                    </svg>
+                </div>
+            </div>
+            <div class="card-value-row">
+                <span class="card-value" id="val-hi">—</span>
+                <span class="card-unit">°C</span>
+            </div>
+            <div class="card-footer">
+                <span class="card-time" id="meta-hi">Waiting for data…</span>
+                <span class="card-range" id="range-hi"></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="row-header">
+        <h2>Historical Data</h2>
+        <span>Last 50 readings &middot; x-axis: time since ESP32 boot</span>
+    </div>
+    <div class="charts-grid">
+        <div class="chart-card">
+            <p class="chart-title">Temperature &amp; Heat Index</p>
+            <div class="chart-wrap">
+                <canvas id="tempChart"></canvas>
+                <div class="chart-empty" id="chartEmptyTemp">Waiting for data…</div>
+            </div>
+        </div>
+        <div class="chart-card">
+            <p class="chart-title">Humidity</p>
+            <div class="chart-wrap">
+                <canvas id="humChart"></canvas>
+                <div class="chart-empty" id="chartEmptyHum">Waiting for data…</div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<footer>
+    Updates every 15 s &middot; Firebase Realtime Database live listener
+</footer>
+
+<script type="module" src="app.js"></script>
+
+</body>
+</html>
