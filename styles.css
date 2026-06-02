@@ -118,7 +118,7 @@ header {
     font-weight: 500;
 }
 
-.head-right { display: flex; align-items: center; gap: 12px; }
+.head-right { display: flex; align-items: center; gap: 12px; margin-left: auto; }
 
 /* Live pill */
 .live-pill {
