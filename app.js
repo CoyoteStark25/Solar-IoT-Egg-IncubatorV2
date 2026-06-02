@@ -294,8 +294,8 @@ onValue(
         updateRangeBar('hi',   latest.heat_index_c,  Math.min(...his),   Math.max(...his));
 
         // Status strip timestamps
-        lastReceived   = Date.now();
         latestDeviceTs = latest.last_update;
+        lastReceived   = latestDeviceTs * 1000;
         const a = wallAgo(lastReceived);
         lastSeen.textContent    = `Updated ${a}`;
         stripSynced.textContent = `Synced ${a}`;
