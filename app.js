@@ -57,6 +57,8 @@ document.getElementById('themeBtn').addEventListener('click', () => {
 // ── DOM refs ──────────────────────────────────────────────
 const livePill    = document.getElementById('livePill');
 const liveLabel   = document.getElementById('liveLabel');
+const devicePill  = document.getElementById('devicePill');
+const deviceLabel = document.getElementById('deviceLabel');
 const stripDot    = document.getElementById('stripDot');
 const stripConn   = document.getElementById('stripConn');
 const stripUptime = document.getElementById('stripUptime');
@@ -74,6 +76,12 @@ onValue(ref(db, '.info/connected'), snap => {
 
 // ── Time helpers ──────────────────────────────────────────
 let lastReceived = null;
+let latestDeviceTs = null;
+
+function fmtTime(unixSec) {
+    if (!unixSec) return '—';
+    return new Date(unixSec * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
+}
 
 function wallAgo(ts) {
     const s = Math.floor((Date.now() - ts) / 1000);
@@ -84,14 +92,12 @@ function wallAgo(ts) {
     return `${Math.floor(m / 60)}h ${m % 60}m ago`;
 }
 
-function bootTime(ms) {
-    const s   = Math.round(ms / 1000);
-    const h   = Math.floor(s / 3600);
-    const m   = Math.floor((s % 3600) / 60);
-    const sec = s % 60;
-    if (h > 0) return `${h}h ${m}m`;
-    if (m > 0) return `${m}m ${sec}s`;
-    return `${sec}s`;
+function updateDeviceBadge() {
+    if (latestDeviceTs == null) return;
+    const ageSec = (Date.now() / 1000) - latestDeviceTs;
+    const online = ageSec <= 900;
+    devicePill.className      = 'live-pill' + (online ? '' : ' off');
+    deviceLabel.textContent   = online ? 'Online' : 'Offline';
 }
 
 setInterval(() => {
@@ -100,6 +106,8 @@ setInterval(() => {
     lastSeen.textContent    = `Updated ${a}`;
     stripSynced.textContent = `Synced ${a}`;
 }, 15000);
+
+setInterval(updateDeviceBadge, 30000);
 
 // ── Range bar updater ─────────────────────────────────────
 function pct(v, min, max) { return Math.min(100, Math.max(0, (v - min) / (max - min) * 100)); }
@@ -166,7 +174,7 @@ function sharedOptions(targetLo, targetHi, yLabel) {
                 bodyColor: p.ttBody,
                 borderColor: p.ttBorder,
                 borderWidth: 1, padding: 12, boxPadding: 4,
-                callbacks: { title: items => `${items[0].label} since boot` }
+                callbacks: { title: items => items[0].label }
             }
         },
         scales: {
@@ -273,7 +281,7 @@ onValue(
         const latest   = readings[readings.length - 1];
         const n        = readings.length;
 
-        const labels = readings.map(r => bootTime(r.timestamp));
+        const labels = readings.map(r => fmtTime(r.last_update));
         const temps  = readings.map(r => r.temperature_c);
         const hums   = readings.map(r => r.humidity);
         const his    = readings.map(r => r.heat_index_c);
@@ -290,12 +298,13 @@ onValue(
         updateRangeBar('hi',   latest.heat_index_c,  Math.min(...his),   Math.max(...his));
 
         // Status strip timestamps
-        lastReceived = Date.now();
-        const a  = wallAgo(lastReceived);
-        const bt = bootTime(latest.timestamp);
+        lastReceived   = Date.now();
+        latestDeviceTs = latest.last_update;
+        const a = wallAgo(lastReceived);
         lastSeen.textContent    = `Updated ${a}`;
         stripSynced.textContent = `Synced ${a}`;
-        stripUptime.textContent = bt;
+        stripUptime.textContent = fmtTime(latest.last_update);
+        updateDeviceBadge();
 
         // Temp + Heat Index chart
         tempChart.data.labels = labels;

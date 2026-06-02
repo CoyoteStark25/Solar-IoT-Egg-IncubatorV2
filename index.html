@@ -23,6 +23,10 @@
             </div>
         </div>
         <div class="head-right">
+            <span class="live-pill off" id="devicePill">
+                <span class="live-dot"></span>
+                <span id="deviceLabel">Checking…</span>
+            </span>
             <span class="live-pill" id="livePill">
                 <span class="live-dot" id="liveDot"></span>
                 <span id="liveLabel">Connecting</span>
@@ -48,7 +52,7 @@
         <span class="chip-sep"></span>
         <span class="chip"><span class="k">Sensor</span>AM2302</span>
         <span class="chip-sep"></span>
-        <span class="chip"><span class="k">Uptime</span><span id="stripUptime">—</span></span>
+        <span class="chip"><span class="k">Last ping</span><span id="stripUptime">—</span></span>
         <span class="chip-sep"></span>
         <span class="chip"><span class="k">Sample</span>every 15 s</span>
         <span class="chip push" id="stripSynced">—</span>
@@ -148,7 +152,7 @@
     <!-- ── Historical charts ───────────────────────────────── -->
     <div class="sec-head">
         <h2>Historical Data</h2>
-        <span class="meta">Last 50 readings · x-axis: time since ESP32 boot</span>
+        <span class="meta">Last 50 readings · x-axis: local time</span>
     </div>
 
     <div class="charts">
