@@ -91,7 +91,7 @@ function wallAgo(ts) {
 function updateDeviceBadge() {
     if (latestDeviceTs == null) return;
     const ageSec = (Date.now() / 1000) - latestDeviceTs;
-    const online = ageSec <= 900;
+    const online = ageSec <= 60;
     devicePill.className      = 'live-pill' + (online ? '' : ' off');
     deviceLabel.textContent   = online ? 'Online' : 'Offline';
 }
