@@ -55,8 +55,6 @@ document.getElementById('themeBtn').addEventListener('click', () => {
 });
 
 // ── DOM refs ──────────────────────────────────────────────
-const livePill    = document.getElementById('livePill');
-const liveLabel   = document.getElementById('liveLabel');
 const devicePill  = document.getElementById('devicePill');
 const deviceLabel = document.getElementById('deviceLabel');
 const stripDot    = document.getElementById('stripDot');
@@ -68,10 +66,8 @@ const lastSeen    = document.getElementById('lastSeen');
 // ── Connection state ──────────────────────────────────────
 onValue(ref(db, '.info/connected'), snap => {
     const live = snap.val() === true;
-    livePill.className       = 'live-pill' + (live ? '' : ' off');
-    liveLabel.textContent    = live ? 'Live' : 'Disconnected';
-    stripDot.className       = 'chip-dot' + (live ? '' : ' off');
-    stripConn.textContent    = live ? 'Firebase connected' : 'Disconnected';
+    stripDot.className    = 'chip-dot' + (live ? '' : ' off');
+    stripConn.textContent = live ? 'Firebase connected' : 'Disconnected';
 });
 
 // ── Time helpers ──────────────────────────────────────────
