@@ -27,6 +27,13 @@
                 <span class="live-dot"></span>
                 <span id="deviceLabel">Checking…</span>
             </span>
+            <button class="view-btn" id="captureBtn" title="View incubator">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+                    <circle cx="12" cy="13" r="4"/>
+                </svg>
+                <span class="view-btn-text">View Incubator</span>
+            </button>
             <button class="theme-btn" id="themeBtn" aria-label="Toggle dark mode" title="Toggle theme">
                 <svg class="ico-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
                     <circle cx="12" cy="12" r="4.2"/>
@@ -52,6 +59,32 @@
         <span class="chip-sep"></span>
         <span class="chip"><span class="k">Sample</span>every 15 s</span>
         <span class="chip push" id="stripSynced">—</span>
+    </div>
+
+    <!-- ── Incubator camera ──────────────────────────────────── -->
+    <div class="capture-panel" id="capturePanel" hidden>
+        <div class="capture-head">
+            <span class="capture-title">Incubator Camera</span>
+            <button class="capture-close" id="captureDismiss" aria-label="Close">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true">
+                    <path d="M18 6 6 18M6 6l12 12"/>
+                </svg>
+            </button>
+        </div>
+        <div id="captureContent">
+            <div class="capture-loading" id="captureLoading">
+                <div class="capture-spinner"></div>
+                <p class="capture-msg" id="captureMsg">Sending trigger…</p>
+            </div>
+            <img class="capture-img" id="captureImg" src="" alt="Incubator view" hidden>
+            <div class="capture-err" id="captureErrBox" hidden>
+                <svg class="capture-err-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                    <circle cx="12" cy="12" r="10"/>
+                    <path d="M12 8v4M12 16h.01"/>
+                </svg>
+                <p id="captureErrMsg">Capture failed.</p>
+            </div>
+        </div>
     </div>
 
     <!-- ── Live readings ──────────────────────────────────── -->
@@ -188,5 +221,6 @@
 
 </div>
 <script type="module" src="app.js"></script>
+
 </body>
 </html>

@@ -1,6 +1,6 @@
 import { initializeApp }
     from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
-import { getDatabase, ref, query, orderByKey, limitToLast, onValue }
+import { getDatabase, ref, query, orderByKey, limitToLast, onValue, set, get }
     from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js';
 
 // ── Firebase ──────────────────────────────────────────────
@@ -317,3 +317,100 @@ onValue(
         humChart.update();
     }
 );
+
+// ── Incubator Camera ──────────────────────────────────────
+let captureActive        = false;
+let captureStatusUnsub   = null;
+let captureSeenCapturing = false;
+let captureTimeoutId     = null;
+
+const captureBtn     = document.getElementById('captureBtn');
+const capturePanel   = document.getElementById('capturePanel');
+const captureLoading = document.getElementById('captureLoading');
+const captureMsg     = document.getElementById('captureMsg');
+const captureImg     = document.getElementById('captureImg');
+const captureErrBox  = document.getElementById('captureErrBox');
+const captureErrMsg  = document.getElementById('captureErrMsg');
+const captureDismiss = document.getElementById('captureDismiss');
+
+function setLoadingState(msg) {
+    captureMsg.textContent = msg;
+    captureLoading.hidden  = false;
+    captureImg.hidden      = true;
+    captureErrBox.hidden   = true;
+}
+
+function setImageState(url) {
+    captureImg.src        = url;
+    captureLoading.hidden = true;
+    captureErrBox.hidden  = true;
+    captureImg.hidden     = false;
+}
+
+function setErrorState(msg) {
+    captureErrMsg.textContent = msg;
+    captureLoading.hidden     = true;
+    captureImg.hidden         = true;
+    captureErrBox.hidden      = false;
+}
+
+function cleanupCapture() {
+    if (captureStatusUnsub) { captureStatusUnsub(); captureStatusUnsub = null; }
+    clearTimeout(captureTimeoutId); captureTimeoutId = null;
+    captureActive        = false;
+    captureSeenCapturing = false;
+    captureBtn.disabled  = false;
+}
+
+captureDismiss.addEventListener('click', () => {
+    cleanupCapture();
+    capturePanel.hidden = true;
+    captureImg.src = '';
+});
+
+captureBtn.addEventListener('click', async () => {
+    if (captureActive) return;
+    captureActive       = true;
+    captureSeenCapturing = false;
+    captureBtn.disabled = true;
+
+    capturePanel.hidden = false;
+    setLoadingState('Sending trigger…');
+
+    try {
+        await set(ref(db, '/capture/trigger'), true);
+    } catch {
+        setErrorState('Failed to write to database — check your connection.');
+        cleanupCapture();
+        return;
+    }
+
+    setLoadingState('Capturing, please wait…');
+
+    captureTimeoutId = setTimeout(() => {
+        setErrorState('Timed out — device did not respond within 30 s.');
+        cleanupCapture();
+    }, 30000);
+
+    captureStatusUnsub = onValue(ref(db, '/capture/status'), async snap => {
+        if (!captureActive) return;
+        const status = snap.val();
+
+        if (status === 'capturing') {
+            captureSeenCapturing = true;
+        } else if (status === 'done' && captureSeenCapturing) {
+            cleanupCapture();
+            try {
+                const urlSnap = await get(ref(db, '/capture/imageUrl'));
+                setImageState(urlSnap.val() ?? '');
+            } catch {
+                setErrorState('Capture succeeded but image URL could not be loaded.');
+            }
+            set(ref(db, '/capture/trigger'), false).catch(() => {});
+        } else if (status === 'error' && captureSeenCapturing) {
+            cleanupCapture();
+            setErrorState('Capture failed — check device connection and try again.');
+            set(ref(db, '/capture/trigger'), false).catch(() => {});
+        }
+    });
+});

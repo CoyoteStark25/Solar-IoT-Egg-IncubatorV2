@@ -167,6 +167,25 @@ header {
 [data-theme="light"] .ico-sun  { display: none; }
 [data-theme="dark"]  .ico-moon { display: none; }
 
+/* View Incubator button */
+.view-btn {
+    display: inline-flex; align-items: center; gap: 7px;
+    padding: 9px 16px;
+    border-radius: var(--radius-sm);
+    border: 1px solid color-mix(in oklch, var(--humid) 35%, var(--line));
+    background: color-mix(in oklch, var(--humid-soft) 55%, var(--card));
+    color: color-mix(in oklch, var(--humid) 82%, var(--ink));
+    font-family: "Hanken Grotesque", system-ui, sans-serif;
+    font-size: 0.82rem; font-weight: 600;
+    cursor: pointer;
+    transition: transform .2s ease, background .25s, border-color .25s, opacity .2s;
+    box-shadow: var(--shadow-sm);
+    white-space: nowrap;
+}
+.view-btn:hover:not(:disabled) { transform: translateY(-1px); border-color: color-mix(in oklch, var(--humid) 55%, var(--line)); }
+.view-btn:disabled { opacity: 0.48; cursor: not-allowed; }
+.view-btn svg { width: 16px; height: 16px; flex: none; }
+
 /* ── Status strip ────────────────────────────────────────── */
 .strip {
     margin-top: 22px;
@@ -414,6 +433,65 @@ header {
     pointer-events: none;
 }
 
+/* ── Capture panel ───────────────────────────────────────── */
+.capture-panel {
+    margin-top: 16px;
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    overflow: hidden;
+    box-shadow: var(--shadow);
+    transition: background .3s, border-color .3s;
+}
+
+.capture-head {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--line-soft);
+}
+.capture-title {
+    font-family: "Bricolage Grotesque", sans-serif;
+    font-size: 0.78rem; font-weight: 700;
+    letter-spacing: 0.10em; text-transform: uppercase;
+    color: var(--ink-2);
+}
+.capture-close {
+    width: 30px; height: 30px; border-radius: 50%;
+    border: 1px solid var(--line);
+    background: transparent; color: var(--ink-3);
+    cursor: pointer;
+    display: grid; place-items: center;
+    transition: background .2s, color .2s, border-color .2s;
+    flex: none;
+}
+.capture-close:hover { background: var(--temp-soft); color: var(--temp); border-color: color-mix(in oklch, var(--temp) 28%, transparent); }
+.capture-close svg { width: 14px; height: 14px; }
+
+.capture-loading {
+    display: flex; flex-direction: column; align-items: center;
+    gap: 16px; padding: 36px 24px;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.capture-spinner {
+    width: 38px; height: 38px; border-radius: 50%;
+    border: 3px solid var(--line);
+    border-top-color: var(--humid);
+    animation: spin 0.75s linear infinite;
+}
+.capture-msg { font-size: 0.88rem; font-weight: 500; color: var(--ink-2); }
+
+.capture-img {
+    width: 100%; max-height: 520px;
+    object-fit: contain; display: block;
+}
+
+.capture-err {
+    display: flex; flex-direction: column; align-items: center;
+    gap: 12px; padding: 36px 24px; text-align: center;
+}
+.capture-err-icon { width: 36px; height: 36px; color: var(--temp); }
+.capture-err p { font-size: 0.88rem; font-weight: 500; color: color-mix(in oklch, var(--temp) 80%, var(--ink)); max-width: 340px; line-height: 1.5; }
+
 /* ── Footer ──────────────────────────────────────────────── */
 footer {
     margin-top: 30px; padding: 18px 4px 6px;
@@ -435,4 +513,6 @@ footer {
 @media (max-width: 520px) {
     .brand .sub { display: none; }
     .head-right { gap: 8px; }
+    .view-btn-text { display: none; }
+    .view-btn { padding: 9px 11px; }
 }
